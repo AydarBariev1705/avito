@@ -1,0 +1,26 @@
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: avito-postgres
+    command: -p ${POSTGRES_PORT:?err}
+    expose:
+      - ${POSTGRES_PORT:?err}
+    ports:
+      - ${POSTGRES_PORT:?err}:${POSTGRES_PORT:?err}
+    environment:
+      - POSTGRES_USER=${POSTGRES_USERNAME:?err}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?err}
+      - POSTGRES_DB=${POSTGRES_DATABASE:?err}
+    volumes:
+      - ./postgres_db/:/var/lib/postgresql/data
+  app:
+    build: .
+    command: uvicorn main:app --host 0.0.0.0 --port 8080 --reload
+    volumes:
+      - .:/app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
